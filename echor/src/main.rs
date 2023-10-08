@@ -1,7 +1,7 @@
 use clap::{App, Arg};
 
 fn main() {
-    let matches = App::new("echo-rs")
+    let matches = App::new("echor")
         .version("0.1")
         .author("Richard Hoffmann <rhoffmann@fastmail.com>")
         .about("Echo for Rust")

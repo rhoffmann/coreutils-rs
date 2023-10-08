@@ -7,7 +7,7 @@ type TestResult = Result<(), Box<dyn std::error::Error>>;
 
 fn run(args: &[&str], expected_file: &str) -> TestResult {
     let expected = fs::read_to_string(expected_file)?;
-    Command::cargo_bin("echo-rs")?
+    Command::cargo_bin("echor")?
         .args(args)
         .assert()
         .success()
@@ -17,7 +17,7 @@ fn run(args: &[&str], expected_file: &str) -> TestResult {
 
 #[test]
 fn dies_without_arguments() -> TestResult {
-    let mut cmd = Command::cargo_bin("echo-rs")?;
+    let mut cmd = Command::cargo_bin("echor")?;
 
     cmd.assert()
         .failure()
