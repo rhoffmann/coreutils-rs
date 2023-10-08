@@ -1,4 +1,8 @@
-use std::error::Error;
+use std::{
+    error::Error,
+    fs::File,
+    io::{self, BufRead, BufReader},
+};
 
 use clap::{App, Arg};
 
@@ -48,6 +52,36 @@ pub fn get_args() -> ResultType<Config> {
 }
 
 pub fn run(config: Config) -> ResultType<()> {
-    dbg!(config);
+    let mut num_line = 1;
+    for filename in config.files {
+        match open(&filename) {
+            Err(err) => eprintln!("Could not open file {}: {}", filename, err),
+            Ok(reader) => {
+                for line in reader.lines() {
+                    let line = line?;
+                    if config.number_lines {
+                        println!("{:>6}\t{}", num_line, line);
+                        num_line += 1;
+                    } else if config.number_nonblank_lines {
+                        if !line.is_empty() {
+                            println!("{:>6}\t{}", num_line, line);
+                            num_line += 1;
+                        } else {
+                            println!();
+                        }
+                    } else {
+                        println!("{}", line);
+                    }
+                }
+            }
+        }
+    }
     Ok(())
+}
+
+fn open(filename: &str) -> ResultType<Box<dyn BufRead>> {
+    match filename {
+        "-" => Ok(Box::new(BufReader::new(io::stdin()))),
+        _ => Ok(Box::new(BufReader::new(File::open(filename)?))),
+    }
 }
