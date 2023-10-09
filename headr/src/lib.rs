@@ -16,6 +16,8 @@ pub struct Config {
     bytes: Option<usize>,
 }
 
+// error.downcast_ref::<ErrorType>()
+
 pub fn get_args() -> GenericResult<Config> {
     let matches = App::new("headr")
         .version("0.1.0")
