@@ -1,4 +1,8 @@
-use std::error::Error;
+use std::{
+    error::Error,
+    fs::File,
+    io::{self, BufRead, BufReader},
+};
 
 use clap::{App, Arg};
 
@@ -63,7 +67,12 @@ pub fn get_args() -> ResultType<Config> {
 }
 
 pub fn run(config: Config) -> ResultType<()> {
-    println!("{:#?}", config);
+    for filename in config.files {
+        match open(&filename) {
+            Err(err) => eprintln!("{}: {}", filename, err),
+            Ok(_) => println!("Opened {}", filename),
+        }
+    }
     Ok(())
 }
 
@@ -71,6 +80,13 @@ fn parse_positive_int(val: &str) -> ResultType<usize> {
     match val.parse() {
         Ok(n) if n > 0 => Ok(n),
         _ => Err(From::from(val)), // or Err(val.into())
+    }
+}
+
+fn open(filename: &str) -> ResultType<Box<dyn BufRead>> {
+    match filename {
+        "-" => Ok(Box::new(BufReader::new(io::stdin()))),
+        _ => Ok(Box::new(BufReader::new(File::open(filename)?))),
     }
 }
 
