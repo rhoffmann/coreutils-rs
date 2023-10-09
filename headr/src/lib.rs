@@ -6,7 +6,8 @@ use std::{
 
 use clap::{App, Arg};
 
-type ResultType<T> = Result<T, Box<dyn Error>>;
+type GenericError = Box<dyn Error + Send + Sync + 'static>;
+type GenericResult<T> = Result<T, GenericError>;
 
 #[derive(Debug)]
 pub struct Config {
@@ -15,7 +16,7 @@ pub struct Config {
     bytes: Option<usize>,
 }
 
-pub fn get_args() -> ResultType<Config> {
+pub fn get_args() -> GenericResult<Config> {
     let matches = App::new("headr")
         .version("0.1.0")
         .author("Richard Hoffmann <rhoffmann@fastmail.com>")
@@ -66,7 +67,7 @@ pub fn get_args() -> ResultType<Config> {
     })
 }
 
-pub fn run(config: Config) -> ResultType<()> {
+pub fn run(config: Config) -> GenericResult<()> {
     for filename in config.files {
         match open(&filename) {
             Err(err) => eprintln!("{}: {}", filename, err),
@@ -76,14 +77,14 @@ pub fn run(config: Config) -> ResultType<()> {
     Ok(())
 }
 
-fn parse_positive_int(val: &str) -> ResultType<usize> {
+fn parse_positive_int(val: &str) -> GenericResult<usize> {
     match val.parse() {
         Ok(n) if n > 0 => Ok(n),
         _ => Err(From::from(val)), // or Err(val.into())
     }
 }
 
-fn open(filename: &str) -> ResultType<Box<dyn BufRead>> {
+fn open(filename: &str) -> GenericResult<Box<dyn BufRead>> {
     match filename {
         "-" => Ok(Box::new(BufReader::new(io::stdin()))),
         _ => Ok(Box::new(BufReader::new(File::open(filename)?))),
