@@ -61,16 +61,33 @@ pub fn get_args() -> GenericResult<Config> {
         )
         .get_matches();
 
+    let mut lines = matches.is_present("lines");
+    let mut words = matches.is_present("words");
+    let mut bytes = matches.is_present("bytes");
+    let chars = matches.is_present("chars");
+
+    if [lines, words, bytes, chars].iter().all(|b| b == &false) {
+        lines = true;
+        words = true;
+        bytes = true;
+    }
+
     Ok(Config {
         files: matches.values_of_lossy("files").unwrap(),
-        lines: true,
-        words: true,
-        bytes: true,
-        chars: false,
+        lines,
+        words,
+        bytes,
+        chars,
     })
 }
 
 pub fn run(config: Config) -> GenericResult<()> {
+    for filename in &config.files {
+        match open(filename) {
+            Err(err) => eprintln!("{}: {}", filename, err),
+            Ok(_) => println!("Opened {}: ok", filename),
+        }
+    }
     println!("{:#?}", config);
     Ok(())
 }
