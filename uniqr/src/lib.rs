@@ -80,7 +80,7 @@ pub fn run(config: Config) -> GenericResult<()> {
         }
 
         if line.trim_end() != previous.trim_end() {
-            print(count, &previous);
+            print(count, &previous)?;
             previous = line.clone();
             count = 0;
         }
@@ -89,7 +89,7 @@ pub fn run(config: Config) -> GenericResult<()> {
         line.clear();
     }
 
-    print(count, &previous);
+    print(count, &previous)?;
 
     Ok(())
 }

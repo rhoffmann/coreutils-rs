@@ -1,2 +1,4 @@
 [workspace]
+
 members = ["catr", "headr", "echor", "wcr", "uniqr"]
+resolver = "2"
